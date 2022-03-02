@@ -75,12 +75,17 @@ for i in range(len(test_s_scaled)):
     pred.append(action)
 
 pred = [pred[i][0] for i in range(len(test_s_scaled))]
+pred = np.array(pred)
+p_max, p_min = pred.max(),pred.min()
+pred = (pred-p_min)/(p_max-p_min)
 pred = pd.Series(pred)
-pred = pred*(A-B)+B
+# pred = pred*(A-B)+B
+test_max, test_min = test_a.max(),test_a.min()
+pred = (pred*(test_max-test_min))+test_min
 actual = pd.Series(test_a)
+# actual = actual*(A-B)+B
 
 plt.plot(pred,label='pred')
-plt.plot(actual,label = 'true')
-plt.xlabel('Predicted Value')
-plt.ylabel('Actual value')
+plt.plot(actual,label='true')
+plt.legend()
 plt.show()
