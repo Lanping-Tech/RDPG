@@ -96,7 +96,8 @@ class RDPG:
         hard_update(self.a_, self.a)
         hard_update(self.q_sa_, self.q_sa)
 
-        self.memory = deque(maxlen = self.memory_size)
+        self.memory = np.zeros((self.memory_size, n_features * 2 + 2))
+        self.memory_counter = 0
 
         self.learn_step_counter = 0
 
@@ -117,7 +118,10 @@ class RDPG:
         reward = np.reshape(reward, [1,-1])
 
         transition = np.concatenate((state, action, reward, next_state),axis = 1)
-        self.memory.append(transition[0, :])
+        # self.memory.append(transition[0, :])
+        index = self.memory_counter % self.memory_size
+        self.memory[index, :] = transition[0, :]
+        self.memory_counter += 1
 
     def learn(self):
         if len(self.memory) == self.memory_size:
@@ -133,7 +137,8 @@ class RDPG:
             self.a_.zero_grad()
             self.q_sa_.zero_grad()
 
-            batch = np.array(random.sample(self.memory, self.batch_size))
+            sample_index = np.random.choice(self.memory_size, self.batch_size)
+            batch = self.memory[sample_index, :]
             batch_s = batch[:,:self.n_features]
             batch_a = batch[:,self.n_features:(self.n_features + 1)]
             batch_r = batch[:,(self.n_features + 1):(self.n_features + 2)]
@@ -162,18 +167,4 @@ class RDPG:
             policy_loss.backward()
             self.q_sa_optimizer.step()
             self.a_optimizer.step()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
