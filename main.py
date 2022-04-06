@@ -6,7 +6,6 @@ from rdpg_agent import RDPG
 import matplotlib.pyplot as plt
 import os
 
-
 #####################  hyper parameters  ####################
 N_FEATURES = 6
 A_LOW = 0
